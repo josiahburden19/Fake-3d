@@ -1,0 +1,83 @@
+function init(self)
+	self.screen_center = vmath.vector3()
+	self.screen_center.x, self.screen_center.y = window.get_size()
+	self.screen_center = self.screen_center/2
+	pr_angle = vmath.vector3()
+	mult = 1
+	angle = vmath.vector3(0, 0, 0)
+	length_of_line = 100
+	update_angle()
+	w = hash('w')
+	a = hash('a')
+	s = hash('s')
+	d = hash('d')
+	k = hash('k')
+	j = hash('j')
+	shift = hash('shift')
+	space = hash('space')
+	middle_mouse = hash('middle_mouse')
+	msg.post('.', 'acquire_input_focus')
+end
+
+function update_angle()
+	pr_angle.x = math.floor(angle.x)
+	pr_angle.y = math.floor(angle.y)
+	pr_angle.z = math.floor(angle.z)
+	msg.post('gui', 'angle_1',{angle = pr_angle.x})
+	msg.post('gui', 'angle_2',{angle = pr_angle.y})
+	msg.post('gui', 'angle_3',{angle = pr_angle.z})
+end
+
+function update(self, dt)
+	update_angle()
+	local coords = {
+		{90, 0}, {180, 0}, {0, 0}, {270, 0},
+		{0, 90}, {0, -90},
+		{45, 45}, {-45, 45}, {-45, -45}, {45, -45}
+	}
+	for i, v in ipairs(coords) do
+		msg.post("@render:", "draw_line", {
+			start_point = self.screen_center,
+			end_point = vmath.vector3(
+			self.screen_center.x + length_of_line
+			* math.sin(math.rad(angle.x + (v[1])))
+			* math.cos(math.rad(v[2])),
+			self.screen_center.y +  length_of_line
+			* math.cos(math.rad(angle.x + v[1]))
+			* math.sin(math.rad(angle.y + v[2])),
+			0),
+			color = vmath.vector4(math.abs(v[2])/360, 1-math.abs(v[1])/360, math.abs(v[1])/360, 1)
+		})
+		print(math.cos(math.rad(angle.x + v[1])))
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id == shift and action.pressed then
+		mult = 1/8
+	elseif action_id == shift and action.released then
+		mult = 1
+	end
+	if action_id == w then
+		angle.y = angle.y + mult
+	elseif action_id == s then
+		angle.y = angle.y - mult
+	end
+	if action_id == d then
+		angle.x = angle.x + mult
+	elseif action_id == a then
+		angle.x = angle.x - mult
+	end
+	if action_id == k then
+		angle.z = angle.z + mult
+	elseif action_id == j then
+		angle.z = angle.z - mult
+	end
+	if action_id == space and action.pressed then
+		angle = vmath.vector3(0, 0, 0)
+	end
+	if action_id == middle_mouse then
+		angle.x = angle.x + action.dx
+		angle.y = angle.y + action.dy
+	end
+end

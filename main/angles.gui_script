@@ -1,0 +1,18 @@
+function init(self)
+	angle_1 = hash('angle_1')
+	angle_2 = hash('angle_2')
+	angle_3 = hash('angle_3')
+	node_angle_1 = gui.get_node('angle_1')
+	node_angle_2 = gui.get_node('angle_2')
+	node_angle_3 = gui.get_node('angle_3')
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == angle_1 then
+		gui.set_text(node_angle_1, message.angle)
+	elseif message_id == angle_2 then
+		gui.set_text(node_angle_2, message.angle)
+	elseif message_id == angle_3 then
+		gui.set_text(node_angle_3, message.angle)
+	end
+end
